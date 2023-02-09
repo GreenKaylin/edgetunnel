@@ -1,18 +1,22 @@
-name: Remove old artifacts
-
-on:
-  workflow_dispatch:
+name: Deploy
+on: [push]
 
 jobs:
-  remove-old-artifacts:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
 
     steps:
-    - name: Remove old artifacts
-      uses: c-hive/gha-remove-artifacts@v1
-      with:
-        age: '2 years' # '<number> <unit>', e.g. 5 days, 2 years, 90 seconds, parsed by Moment.js
-        # Optional inputs
-        # skip-tags: true
-        # skip-recent: 5
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      # TODO: add a build step here
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "edlss"
+          entrypoint: "./main.ts" # TODO: update entrypoint
